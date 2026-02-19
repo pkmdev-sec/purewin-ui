@@ -331,7 +331,7 @@ export default function SchematicConstellation({ className = '', style = {} }) {
   }, true)
 
   return (
-    <div ref={wrapperRef} style={{ position: 'absolute', inset: 0, contain: 'layout paint' }}>
+    <div ref={wrapperRef} style={{ position: 'absolute', inset: 0 }}>
       <canvas
         ref={canvasRef}
         className={className}
