@@ -1,0 +1,78 @@
+import { useEffect, useRef, useState } from 'react'
+
+function randomInRange(min, max) { return Math.random() * (max - min) + min }
+
+export default function SparklesText({
+  text,
+  sparkleColor = '#8b5cf6',
+  sparkleCount = 8,
+  style = {},
+  className = '',
+}) {
+  const [sparkles, setSparkles] = useState([])
+  const counterRef = useRef(0)
+
+  function createSparkle() {
+    return {
+      id: counterRef.current++,
+      createdAt: Date.now(),
+      color: sparkleColor,
+      size: Math.floor(randomInRange(10, 20)),
+      style: {
+        top: `${randomInRange(-20, 80)}%`,
+        left: `${randomInRange(-10, 110)}%`,
+        zIndex: 2,
+      },
+    }
+  }
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = Date.now()
+      setSparkles(prev => {
+        const fresh = prev.filter(s => now - s.createdAt < 700)
+        if (fresh.length < sparkleCount) {
+          return [...fresh, createSparkle()]
+        }
+        return fresh
+      })
+    }, 120)
+    return () => clearInterval(interval)
+  }, [sparkleColor, sparkleCount])
+
+  return (
+    <span className={className} style={{ position: 'relative', display: 'inline-block', ...style }}>
+      {sparkles.map(s => (
+        <span
+          key={s.id}
+          style={{
+            position: 'absolute',
+            display: 'block',
+            pointerEvents: 'none',
+            zIndex: 2,
+            animation: 'sparkle-fade 700ms ease forwards',
+            ...s.style,
+          }}
+        >
+          <svg
+            width={s.size}
+            height={s.size}
+            viewBox="0 0 160 160"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path d="M80 0C80 0 84.2846 41.2925 101.496 58.504C118.707 75.7154 160 80 160 80C160 80 118.707 84.2846 101.496 101.496C84.2846 118.707 80 160 80 160C80 160 75.7154 118.707 58.504 101.496C41.2925 84.2846 0 80 0 80C0 80 41.2925 75.7154 58.504 58.504C75.7154 41.2925 80 0 80 0Z" fill={s.color} />
+          </svg>
+        </span>
+      ))}
+      <strong style={{ fontWeight: 'inherit', position: 'relative', zIndex: 1 }}>{text}</strong>
+      <style>{`
+        @keyframes sparkle-fade {
+          0% { transform: scale(0) rotate(0deg); opacity: 1; }
+          50% { transform: scale(1) rotate(90deg); opacity: 1; }
+          100% { transform: scale(0) rotate(180deg); opacity: 0; }
+        }
+      `}</style>
+    </span>
+  )
+}

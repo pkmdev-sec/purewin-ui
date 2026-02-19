@@ -1,0 +1,12 @@
+[build]
+builder = "nixpacks"
+buildCommand = "bun run build"
+
+[deploy]
+startCommand = "bunx serve dist -l 3000"
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3
+
+[[deploy.healthchecks]]
+type = "http"
+path = "/"
