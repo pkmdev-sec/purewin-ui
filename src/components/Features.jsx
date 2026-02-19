@@ -140,14 +140,14 @@ export default function Features() {
       }}
     >
       {/* Dither WebGL background — purple dithered wave effect */}
-      <div style={{ position: 'absolute', inset: 0, zIndex: 0, opacity: 0.22, pointerEvents: 'auto' }}>
+      <div style={{ position: 'absolute', inset: 0, zIndex: 0, opacity: 0.55, pointerEvents: 'auto' }}>
         <Dither
-          waveColor={[0.5, 0.1, 0.5]}
+          waveColor={[0.6, 0.14, 0.6]}
           disableAnimation={false}
           enableMouseInteraction
           mouseRadius={0.1}
-          colorNum={4}
-          waveAmplitude={0.3}
+          colorNum={5}
+          waveAmplitude={0.35}
           waveFrequency={3}
           waveSpeed={0.05}
         />
