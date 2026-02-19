@@ -1,7 +1,6 @@
 import { motion, useInView } from 'framer-motion'
-import { useRef, useEffect } from 'react'
+import { useRef } from 'react'
 import { Trash2, Package, BarChart3, Activity, Code2, Shield } from 'lucide-react'
-import AetherField from './ui/AetherField'
 import SilkBackground from './ui/SilkBackground'
 import GlareCard from './ui/GlareCard'
 import NeonBorder from './ui/NeonBorder'
@@ -128,21 +127,6 @@ function FeatureCard({ feature, index }) {
 export default function Features() {
   const sectionRef = useRef(null)
   const isInView = useInView(sectionRef, { once: true, margin: '-100px' })
-
-  useEffect(() => {
-    const style = document.createElement('style')
-    style.textContent = `
-      .shimmer-overlay:hover .shimmer-beam {
-        animation: shimmer 0.8s ease forwards;
-      }
-      @keyframes shimmer {
-        from { left: -60px; }
-        to { left: calc(100% + 60px); }
-      }
-    `
-    document.head.appendChild(style)
-    return () => document.head.removeChild(style)
-  }, [])
 
   return (
     <section

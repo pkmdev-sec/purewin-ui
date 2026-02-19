@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState } from 'react'
+import { useViewportVisibility } from '../../hooks/useViewportVisibility'
 
 // ─── Utilities ────────────────────────────────────────────────────────────────
 function hexToRgba(hex, alpha) {
@@ -120,6 +121,8 @@ function manhattanDist(x1, y1, x2, y2) { return Math.abs(x1 - x2) + Math.abs(y1 
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function SchematicConstellation({ className = '', style = {} }) {
   const canvasRef = useRef(null)
+  const wrapperRef = useRef(null)
+  const isVisibleRef = useViewportVisibility(wrapperRef)
   const mousePos = useMousePosition(16)
   const nodesRef = useRef([])
   const edgesRef = useRef([])
@@ -182,6 +185,7 @@ export default function SchematicConstellation({ className = '', style = {} }) {
 
   useAnimationFrame((dt) => {
     if (!fontsLoadedRef.current) return
+    if (!isVisibleRef.current) return
     const ctx = ctxRef.current
     if (!ctx) return
     const { width, height } = sizeRef.current
@@ -327,10 +331,12 @@ export default function SchematicConstellation({ className = '', style = {} }) {
   }, true)
 
   return (
-    <canvas
-      ref={canvasRef}
-      className={className}
-      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', ...style }}
-    />
+    <div ref={wrapperRef} style={{ position: 'absolute', inset: 0 }}>
+      <canvas
+        ref={canvasRef}
+        className={className}
+        style={{ width: '100%', height: '100%', pointerEvents: 'none', ...style }}
+      />
+    </div>
   )
 }

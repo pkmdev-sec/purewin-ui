@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { useViewportVisibility } from '../../hooks/useViewportVisibility'
 
 const WAVE_CONFIGS = [
   { freq: 0.3, amp: 35, speed: 0.5, color: '#4CAF50', opacity: 0.4 },
@@ -15,6 +16,8 @@ const WAVE_CONFIGS = [
 
 export default function SignalField({ opacity = 1 }) {
   const canvasRef = useRef(null)
+  const wrapperRef = useRef(null)
+  const isVisibleRef = useViewportVisibility(wrapperRef)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -32,6 +35,9 @@ export default function SignalField({ opacity = 1 }) {
     ro.observe(canvas)
 
     function render() {
+      animId = requestAnimationFrame(render)
+      if (!isVisibleRef.current) return
+
       const t = (performance.now() - startTime) / 1000
       const W = canvas.width
       const H = canvas.height
@@ -57,7 +63,6 @@ export default function SignalField({ opacity = 1 }) {
 
       ctx.globalAlpha = 1
       ctx.shadowBlur = 0
-      animId = requestAnimationFrame(render)
     }
 
     render()
@@ -68,16 +73,16 @@ export default function SignalField({ opacity = 1 }) {
   }, [])
 
   return (
-    <canvas
-      ref={canvasRef}
-      style={{
-        position: 'absolute',
-        inset: 0,
-        width: '100%',
-        height: '100%',
-        pointerEvents: 'none',
-        opacity,
-      }}
-    />
+    <div ref={wrapperRef} style={{ position: 'absolute', inset: 0 }}>
+      <canvas
+        ref={canvasRef}
+        style={{
+          width: '100%',
+          height: '100%',
+          pointerEvents: 'none',
+          opacity,
+        }}
+      />
+    </div>
   )
 }

@@ -1,7 +1,10 @@
 import { useEffect, useRef } from 'react'
+import { useViewportVisibility } from '../../hooks/useViewportVisibility'
 
 export default function HoloSun({ width = 600, height = 600, style = {} }) {
   const canvasRef = useRef(null)
+  const wrapperRef = useRef(null)
+  const isVisibleRef = useViewportVisibility(wrapperRef)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -47,11 +50,18 @@ export default function HoloSun({ width = 600, height = 600, style = {} }) {
     }
     canvas.addEventListener('mousemove', handleMouseMove)
 
-    function render() {
+    let lastRenderTime = 0
+    const FRAME_INTERVAL = 1000 / 30
+
+    function render(timestamp) {
+      animId = requestAnimationFrame(render)
+      if (!isVisibleRef.current) return
+      if (timestamp - lastRenderTime < FRAME_INTERVAL) return
+      lastRenderTime = timestamp
+
       frame++
       ctx.clearRect(0, 0, width, height)
 
-      // Corona glow
       const corona = ctx.createRadialGradient(cx, cy, sphereR * 0.4, cx, cy, sphereR * 1.4)
       corona.addColorStop(0, 'rgba(76,175,80,0.08)')
       corona.addColorStop(0.5, 'rgba(30,136,229,0.04)')
@@ -65,18 +75,14 @@ export default function HoloSun({ width = 600, height = 600, style = {} }) {
       mouseVX *= 0.95
       mouseVY *= 0.95
 
-      // Breathing
       const breath = 1 + Math.sin(frame * 0.02) * 0.015
       const r = sphereR * breath
 
-      // Sort by z for depth
       const projected = particles.map(p => {
-        // Rotate Y
         const cosY = Math.cos(rotY), sinY = Math.sin(rotY)
         let x1 = p.ox * cosY - p.oz * sinY
         let z1 = p.ox * sinY + p.oz * cosY
         let y1 = p.oy
-        // Rotate X
         const cosX = Math.cos(rotX), sinX = Math.sin(rotX)
         let y2 = y1 * cosX - z1 * sinX
         let z2 = y1 * sinX + z1 * cosX
@@ -86,7 +92,7 @@ export default function HoloSun({ width = 600, height = 600, style = {} }) {
           py: cy + y2 * r * perspective,
           alpha: (z2 + 1) / 2,
         }
-      }).sort((a, b) => a.alpha - b.alpha)
+      })
 
       projected.forEach(({ px, py, alpha }) => {
         let rf, gf, bf
@@ -111,10 +117,9 @@ export default function HoloSun({ width = 600, height = 600, style = {} }) {
         ctx.fill()
       })
 
-      animId = requestAnimationFrame(render)
     }
 
-    render()
+    animId = requestAnimationFrame(render)
     return () => {
       canvas.removeEventListener('mousemove', handleMouseMove)
       cancelAnimationFrame(animId)
@@ -122,9 +127,11 @@ export default function HoloSun({ width = 600, height = 600, style = {} }) {
   }, [width, height])
 
   return (
-    <canvas
-      ref={canvasRef}
-      style={{ display: 'block', ...style }}
-    />
+    <div ref={wrapperRef} style={{ display: 'inline-block', ...style }}>
+      <canvas
+        ref={canvasRef}
+        style={{ display: 'block' }}
+      />
+    </div>
   )
 }

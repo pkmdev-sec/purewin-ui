@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { useViewportVisibility } from '../../hooks/useViewportVisibility'
 
 /**
  * SilkBackground — React port of inspira-ui's SilkBackground.vue
@@ -115,6 +116,8 @@ export default function SilkBackground({
   style = {},
 }) {
   const canvasRef = useRef(null)
+  const wrapperRef = useRef(null)
+  const isVisibleRef = useViewportVisibility(wrapperRef)
   const glRef = useRef(null)
   const progRef = useRef(null)
   const uniRef = useRef({})
@@ -193,6 +196,9 @@ export default function SilkBackground({
     let prevTime = 0
 
     function render() {
+      rafRef.current = requestAnimationFrame(render)
+      if (!isVisibleRef.current) return
+
       const now = (performance.now() - startRef.current) * 0.001 * speed
       const delta = now - prevTime
       prevTime = now
@@ -207,7 +213,6 @@ export default function SilkBackground({
       gl.uniform1f(u.iSpeed, speed)
 
       gl.drawArrays(gl.TRIANGLES, 0, 6)
-      rafRef.current = requestAnimationFrame(render)
     }
     render()
 
@@ -219,17 +224,17 @@ export default function SilkBackground({
   }, [hue, saturation, brightness, speed])
 
   return (
-    <canvas
-      ref={canvasRef}
-      style={{
-        position: 'absolute',
-        inset: 0,
-        width: '100%',
-        height: '100%',
-        display: 'block',
-        pointerEvents: 'none',
-        ...style,
-      }}
-    />
+    <div ref={wrapperRef} style={{ position: 'absolute', inset: 0 }}>
+      <canvas
+        ref={canvasRef}
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'block',
+          pointerEvents: 'none',
+          ...style,
+        }}
+      />
+    </div>
   )
 }

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { useViewportVisibility } from '../../hooks/useViewportVisibility'
 
 /**
  * FlickeringGrid — React port of inspira-ui's FlickeringGrid.vue
@@ -14,6 +15,7 @@ export default function FlickeringGrid({
 }) {
   const containerRef = useRef(null)
   const canvasRef = useRef(null)
+  const isVisibleRef = useViewportVisibility(containerRef)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -57,27 +59,54 @@ export default function FlickeringGrid({
       }
     }
 
+    let fullRedrawCounter = 0
+
     function draw(time) {
+      animId = requestAnimationFrame(draw)
+      if (!isVisibleRef.current) return
+
       const delta = Math.min((time - lastTime) / 1000, 0.1)
       lastTime = time
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-      if (!squares || !cols || !rows) { animId = requestAnimationFrame(draw); return }
+      if (!squares || !cols || !rows) return
+
+      fullRedrawCounter++
+      const needsFullRedraw = fullRedrawCounter >= 60
+
+      if (needsFullRedraw) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        fullRedrawCounter = 0
+      }
+
       for (let i = 0; i < cols; i++) {
         for (let j = 0; j < rows; j++) {
+          const idx = i * rows + j
           if (Math.random() < flickerChance * delta) {
-            squares[i * rows + j] = Math.random() * maxOpacity
+            const oldVal = squares[idx]
+            squares[idx] = Math.random() * maxOpacity
+            ctx.clearRect(
+              i * (squareSize + gridGap) * dpr,
+              j * (squareSize + gridGap) * dpr,
+              squareSize * dpr,
+              squareSize * dpr,
+            )
+            ctx.fillStyle = `${colorBase}${squares[idx]})`
+            ctx.fillRect(
+              i * (squareSize + gridGap) * dpr,
+              j * (squareSize + gridGap) * dpr,
+              squareSize * dpr,
+              squareSize * dpr,
+            )
+          } else if (needsFullRedraw) {
+            ctx.fillStyle = `${colorBase}${squares[idx]})`
+            ctx.fillRect(
+              i * (squareSize + gridGap) * dpr,
+              j * (squareSize + gridGap) * dpr,
+              squareSize * dpr,
+              squareSize * dpr,
+            )
           }
-          const opacity = squares[i * rows + j]
-          ctx.fillStyle = `${colorBase}${opacity})`
-          ctx.fillRect(
-            i * (squareSize + gridGap) * dpr,
-            j * (squareSize + gridGap) * dpr,
-            squareSize * dpr,
-            squareSize * dpr,
-          )
         }
       }
-      animId = requestAnimationFrame(draw)
     }
 
     setup()
