@@ -2,8 +2,7 @@ import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { TerminalSquare } from 'lucide-react'
 import SentinelTerminal from './ui/SentinelTerminal'
-import SignalField from './ui/SignalField'
-import SchematicConstellation from './ui/SchematicConstellation'
+import FaultyTerminalBg from './ui/FaultyTerminal'
 import { CardContainer, CardBody, CardItem } from './ui/Card3D'
 import HyperText from './ui/HyperText'
 
@@ -22,8 +21,28 @@ export default function Terminal() {
         overflow: 'hidden',
       }}
     >
-      <SignalField opacity={0.1} />
-      <SchematicConstellation style={{ opacity: 0.5 }} />
+      {/* FaultyTerminal WebGL background */}
+      <div style={{ position: 'absolute', inset: 0, zIndex: 0, opacity: 0.45, pointerEvents: 'auto' }}>
+        <FaultyTerminalBg
+          scale={1.7}
+          gridMul={[2, 1]}
+          digitSize={1.8}
+          timeScale={0.5}
+          pause={false}
+          scanlineIntensity={1.1}
+          glitchAmount={1}
+          flickerAmount={1}
+          noiseAmp={1}
+          chromaticAberration={0}
+          dither={0}
+          curvature={0.19}
+          tint="#cc0bda"
+          mouseReact
+          mouseStrength={0.5}
+          pageLoadAnimation
+          brightness={0.7}
+        />
+      </div>
       <div
         style={{
           maxWidth: '1100px',
