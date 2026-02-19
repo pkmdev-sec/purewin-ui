@@ -14,8 +14,7 @@
   isolation: isolate;
   transition: border-color 200ms cubic-bezier(0.5, 1, 0.89, 1);
   user-select: none;
-  height: 100%;
-  min-height: 260px;
+  aspect-ratio: 4 / 5;
 }
 
 .pixel-card::before {
