@@ -1,13 +1,11 @@
-import { useRef, Suspense, lazy } from 'react'
+import { useRef } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { Download, ExternalLink, ChevronDown } from 'lucide-react'
 import ShimmerButton from './ui/ShimmerButton'
 import FlipWords from './ui/FlipWords'
 import GlareCard from './ui/GlareCard'
 import NeonBorder from './ui/NeonBorder'
-
-const Spline = lazy(() => import('@splinetool/react-spline'))
-const SPLINE_SCENE = 'https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode'
+import HeroBackground from './ui/HeroBackground'
 const CHAR_COLORS = ['#c47a7a', '#c4944e', '#c4b84e', '#6ab56a', '#4ab8b8', '#5a8ed4', '#9a72d4']
 
 function MulticolorTitle() {
@@ -65,20 +63,8 @@ export default function Hero() {
         backgroundColor: '#000000',
       }}
     >
-      {/* ── Spline robot — full viewport, no clipping ────────────────────── */}
       <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-        <Suspense fallback={
-          <div style={{
-            width: '100%', height: '100%',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: 'rgba(139,92,246,0.25)',
-            fontFamily: 'var(--font-mono)', fontSize: '0.65rem', letterSpacing: '0.25em',
-          }}>
-            LOADING 3D...
-          </div>
-        }>
-          <Spline scene={SPLINE_SCENE} style={{ width: '100%', height: '100%' }} />
-        </Suspense>
+        <HeroBackground />
       </div>
 
       {/* ── GlareCard — vertically centered left ──────────────────────────── */}

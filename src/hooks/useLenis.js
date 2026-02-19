@@ -9,6 +9,8 @@ export function useLenis() {
       smoothWheel: true,
     })
 
+    lenis.scrollTo(0, { immediate: true })
+
     function raf(time) {
       lenis.raf(time)
       requestAnimationFrame(raf)

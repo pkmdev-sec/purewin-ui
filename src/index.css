@@ -1,6 +1,13 @@
 @import "tailwindcss";
 
-/* ─── GeistPixel Font Faces ──────────────────────────────────────────────── */
+/* ─── Font Faces ─────────────────────────────────────────────────────────── */
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('/fonts/GeistMono-Variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
 @font-face {
   font-family: 'Geist Pixel Square';
   src: url('/fonts/GeistPixel-Square.woff2') format('woff2');
@@ -416,45 +423,4 @@ button {
   100% { transform: translateY(0); opacity: 1; }
 }
 
-/* ─── Hero Split Layout ────────────────────────────────────────────────────── */
-.hero-left {
-  flex: 0 0 44%;
-  max-width: 560px;
-}
-.hero-right {
-  flex: 1;
-  min-height: 520px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-@media (max-width: 900px) {
-  .hero-left, .hero-right {
-    flex: 0 0 100%;
-    max-width: 100%;
-  }
-  #hero > div[style] {
-    flex-direction: column;
-  }
-  .hero-right {
-    min-height: 380px;
-  }
-}
 
-/* ─── Hero Two-Column Layout ──────────────────────────────────────────────── */
-.hero-text-col {
-  flex: 0 0 42%;
-  position: relative;
-  z-index: 2;
-}
-.hero-spline-col {
-  flex: 1;
-  position: relative;
-  z-index: 1;
-  min-height: 100vh;
-}
-@media (max-width: 860px) {
-  #hero { flex-direction: column !important; }
-  .hero-text-col { flex: 0 0 auto; width: 100%; padding-top: 100px; }
-  .hero-spline-col { flex: 0 0 auto; width: 100%; min-height: 55vw; }
-}

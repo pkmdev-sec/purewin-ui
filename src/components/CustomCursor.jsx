@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 
+const IDLE_MS = 150
+const LERP = 0.12
+
 export default function CustomCursor() {
   const dotRef = useRef(null)
   const trailRefs = useRef([])
@@ -7,8 +10,10 @@ export default function CustomCursor() {
   const pos = useRef({ x: -100, y: -100 })
   const trail = useRef(Array.from({ length: 5 }, () => ({ x: -100, y: -100 })))
   const [hovering, setHovering] = useState(false)
+  const visibleRef = useRef(false)
   const [visible, setVisible] = useState(false)
   const animRef = useRef(null)
+  const lastMoveRef = useRef(0)
 
   useEffect(() => {
     const isMobile = window.matchMedia('(pointer: coarse)').matches
@@ -17,7 +22,11 @@ export default function CustomCursor() {
     function handleMove(e) {
       mouse.current.x = e.clientX
       mouse.current.y = e.clientY
-      if (!visible) setVisible(true)
+      lastMoveRef.current = performance.now()
+      if (!visibleRef.current) {
+        visibleRef.current = true
+        setVisible(true)
+      }
     }
 
     function handleOver(e) {
@@ -38,6 +47,7 @@ export default function CustomCursor() {
     }
 
     function handleLeave() {
+      visibleRef.current = false
       setVisible(false)
     }
 
@@ -46,28 +56,34 @@ export default function CustomCursor() {
     document.addEventListener('mouseout', handleOut)
     document.addEventListener('mouseleave', handleLeave)
 
-    function animate() {
-      const lerp = 0.12
-      pos.current.x += (mouse.current.x - pos.current.x) * lerp
-      pos.current.y += (mouse.current.y - pos.current.y) * lerp
+    function animate(now) {
+      const idle = now - lastMoveRef.current > IDLE_MS
+      const dx = mouse.current.x - pos.current.x
+      const dy = mouse.current.y - pos.current.y
+      const converged = Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1
 
-      if (dotRef.current) {
-        dotRef.current.style.transform = `translate(${pos.current.x}px, ${pos.current.y}px) translate(-50%, -50%)`
-      }
+      if (!idle || !converged) {
+        pos.current.x += dx * LERP
+        pos.current.y += dy * LERP
 
-      for (let i = trail.current.length - 1; i > 0; i--) {
-        trail.current[i].x = trail.current[i - 1].x
-        trail.current[i].y = trail.current[i - 1].y
-      }
-      trail.current[0].x = pos.current.x
-      trail.current[0].y = pos.current.y
-
-      trailRefs.current.forEach((el, i) => {
-        if (el) {
-          el.style.transform = `translate(${trail.current[i].x}px, ${trail.current[i].y}px) translate(-50%, -50%)`
-          el.style.opacity = (1 - (i + 1) / trail.current.length) * 0.4
+        if (dotRef.current) {
+          dotRef.current.style.transform = `translate(${pos.current.x}px, ${pos.current.y}px) translate(-50%, -50%)`
         }
-      })
+
+        for (let i = trail.current.length - 1; i > 0; i--) {
+          trail.current[i].x = trail.current[i - 1].x
+          trail.current[i].y = trail.current[i - 1].y
+        }
+        trail.current[0].x = pos.current.x
+        trail.current[0].y = pos.current.y
+
+        trailRefs.current.forEach((el, i) => {
+          if (el) {
+            el.style.transform = `translate(${trail.current[i].x}px, ${trail.current[i].y}px) translate(-50%, -50%)`
+            el.style.opacity = (1 - (i + 1) / trail.current.length) * 0.4
+          }
+        })
+      }
 
       animRef.current = requestAnimationFrame(animate)
     }
@@ -81,7 +97,7 @@ export default function CustomCursor() {
       document.removeEventListener('mouseleave', handleLeave)
       if (animRef.current) cancelAnimationFrame(animRef.current)
     }
-  }, [visible])
+  }, [])
 
   const isMobile = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
   if (isMobile) return null

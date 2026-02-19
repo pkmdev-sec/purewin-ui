@@ -127,7 +127,7 @@ export default function HoloSun({ width = 600, height = 600, style = {} }) {
   }, [width, height])
 
   return (
-    <div ref={wrapperRef} style={{ display: 'inline-block', ...style }}>
+    <div ref={wrapperRef} style={{ display: 'inline-block', contain: 'layout paint', ...style }}>
       <canvas
         ref={canvasRef}
         style={{ display: 'block' }}

@@ -121,7 +121,7 @@ export default function FlickeringGrid({
   return (
     <div
       ref={containerRef}
-      style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden', ...style }}
+      style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden', contain: 'layout paint', ...style }}
     >
       <canvas ref={canvasRef} style={{ display: 'block', pointerEvents: 'none' }} />
     </div>

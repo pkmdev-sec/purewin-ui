@@ -131,7 +131,7 @@ export default function AsciiSpheres({ style = {} }) {
   }, [])
 
   return (
-    <div ref={containerRef} style={{ position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none', ...style }}>
+    <div ref={containerRef} style={{ position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none', contain: 'layout paint', ...style }}>
       <Canvas
         gl={{ alpha: true, antialias: false, powerPreference: 'high-performance' }}
         camera={{ position: [0, 0, 6], fov: 55 }}

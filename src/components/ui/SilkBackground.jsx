@@ -224,7 +224,7 @@ export default function SilkBackground({
   }, [hue, saturation, brightness, speed])
 
   return (
-    <div ref={wrapperRef} style={{ position: 'absolute', inset: 0 }}>
+    <div ref={wrapperRef} style={{ position: 'absolute', inset: 0, contain: 'layout paint' }}>
       <canvas
         ref={canvasRef}
         style={{

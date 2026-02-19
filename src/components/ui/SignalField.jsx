@@ -73,7 +73,7 @@ export default function SignalField({ opacity = 1 }) {
   }, [])
 
   return (
-    <div ref={wrapperRef} style={{ position: 'absolute', inset: 0 }}>
+    <div ref={wrapperRef} style={{ position: 'absolute', inset: 0, contain: 'layout paint' }}>
       <canvas
         ref={canvasRef}
         style={{
