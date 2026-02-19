@@ -1,7 +1,7 @@
 import { motion, useInView } from 'framer-motion'
 import { useRef } from 'react'
 import { Trash2, Package, BarChart3, Activity, Code2, Shield } from 'lucide-react'
-import SilkBackground from './ui/SilkBackground'
+import Dither from './ui/Dither'
 import GlareCard from './ui/GlareCard'
 import NeonBorder from './ui/NeonBorder'
 import BlurReveal from './ui/BlurReveal'
@@ -139,15 +139,19 @@ export default function Features() {
         overflow: 'hidden',
       }}
     >
-      {/* Silk WebGL — subtle purple texture over pitch black */}
-      {/* Black & white silk texture — saturation=0 gives pure grayscale */}
-      <SilkBackground
-        hue={0}
-        saturation={0}
-        brightness={1.0}
-        speed={0.4}
-        style={{ opacity: 0.22, pointerEvents: 'auto', zIndex: 0 }}
-      />
+      {/* Dither WebGL background — purple dithered wave effect */}
+      <div style={{ position: 'absolute', inset: 0, zIndex: 0, opacity: 0.22, pointerEvents: 'auto' }}>
+        <Dither
+          waveColor={[0.5, 0.1, 0.5]}
+          disableAnimation={false}
+          enableMouseInteraction
+          mouseRadius={0.1}
+          colorNum={4}
+          waveAmplitude={0.3}
+          waveFrequency={3}
+          waveSpeed={0.05}
+        />
+      </div>
 
       {/* Very light vignette — top+bottom edge only, keeps center clear */}
       <div style={{
