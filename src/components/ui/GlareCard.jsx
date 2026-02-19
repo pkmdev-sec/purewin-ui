@@ -51,7 +51,6 @@ export default function GlareCard({ children, style = {} }) {
       <div style={{
         height: '100%',
         transform: `rotateY(${rx}deg) rotateX(${ry}deg)`,
-        transition: hover ? 'transform 150ms linear' : 'transform 400ms ease',
         willChange: 'transform',
         borderRadius: '20px',
         overflow: 'hidden',
