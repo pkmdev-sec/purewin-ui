@@ -1,4 +1,5 @@
 import { useRef, Suspense, lazy } from 'react'
+import { useDeviceTier } from '../hooks/useDeviceTier'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { Download, ExternalLink, ChevronDown } from 'lucide-react'
 import ShimmerButton from './ui/ShimmerButton'
@@ -47,6 +48,7 @@ function MulticolorTitle() {
 }
 
 export default function Hero() {
+  const tier = useDeviceTier()
   const heroRef = useRef(null)
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
   const cardY = useTransform(scrollYProgress, [0, 1], [0, -40])
@@ -67,18 +69,25 @@ export default function Hero() {
     >
       {/* ── Spline robot — full viewport, no clipping ────────────────────── */}
       <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-        <Suspense fallback={
+        {tier === 'low' ? (
           <div style={{
             width: '100%', height: '100%',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: 'rgba(139,92,246,0.25)',
-            fontFamily: 'var(--font-mono)', fontSize: '0.65rem', letterSpacing: '0.25em',
-          }}>
-            LOADING 3D...
-          </div>
-        }>
-          <Spline scene={SPLINE_SCENE} style={{ width: '100%', height: '100%' }} />
-        </Suspense>
+            background: 'radial-gradient(ellipse at 60% 50%, rgba(139,92,246,0.15) 0%, transparent 70%)',
+          }} />
+        ) : (
+          <Suspense fallback={
+            <div style={{
+              width: '100%', height: '100%',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: 'rgba(139,92,246,0.25)',
+              fontFamily: 'var(--font-mono)', fontSize: '0.65rem', letterSpacing: '0.25em',
+            }}>
+              LOADING 3D...
+            </div>
+          }>
+            <Spline scene={SPLINE_SCENE} style={{ width: '100%', height: '100%' }} />
+          </Suspense>
+        )}
       </div>
 
       {/* ── GlareCard — vertically centered left ──────────────────────────── */}

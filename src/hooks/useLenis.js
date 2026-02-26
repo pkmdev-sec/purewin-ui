@@ -1,21 +1,28 @@
 import { useEffect } from 'react'
 import Lenis from 'lenis'
+import { useReducedMotion } from './useReducedMotion'
 
 export function useLenis() {
-  useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smoothWheel: true,
-    })
+	const reduced = useReducedMotion()
 
-    function raf(time) {
-      lenis.raf(time)
-      requestAnimationFrame(raf)
-    }
+	useEffect(() => {
+		// Skip smooth scroll on touch devices — native momentum scroll is better
+		const isTouch = window.matchMedia('(pointer: coarse)').matches
+		if (isTouch || reduced) return
 
-    requestAnimationFrame(raf)
+		const lenis = new Lenis({
+			duration: 1.2,
+			easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+			smoothWheel: true,
+		})
 
-    return () => lenis.destroy()
-  }, [])
+		function raf(time) {
+			lenis.raf(time)
+			requestAnimationFrame(raf)
+		}
+
+		requestAnimationFrame(raf)
+
+		return () => lenis.destroy()
+	}, [reduced])
 }
