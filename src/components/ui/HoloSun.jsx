@@ -1,10 +1,16 @@
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { useViewportVisibility } from '../../hooks/useViewportVisibility'
 
 export default function HoloSun({ width = 600, height = 600, style = {} }) {
   const canvasRef = useRef(null)
   const wrapperRef = useRef(null)
-  const isVisibleRef = useViewportVisibility(wrapperRef)
+  const restartRef = useRef(null)
+
+  const onBecomeVisible = useCallback(() => {
+    if (restartRef.current) restartRef.current(performance.now())
+  }, [])
+
+  const isVisibleRef = useViewportVisibility(wrapperRef, { onBecomeVisible })
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -56,9 +62,11 @@ export default function HoloSun({ width = 600, height = 600, style = {} }) {
     const FRAME_INTERVAL = 1000 / 30
 
     function render(timestamp) {
-      animId = requestAnimationFrame(render)
       if (!isVisibleRef.current) return
-      if (timestamp - lastRenderTime < FRAME_INTERVAL) return
+      if (timestamp - lastRenderTime < FRAME_INTERVAL) {
+        animId = requestAnimationFrame(render)
+        return
+      }
       lastRenderTime = timestamp
 
       frame++
@@ -121,12 +129,15 @@ export default function HoloSun({ width = 600, height = 600, style = {} }) {
         ctx.fill()
       }
 
+      animId = requestAnimationFrame(render)
     }
+    restartRef.current = render
 
     animId = requestAnimationFrame(render)
     return () => {
       canvas.removeEventListener('mousemove', handleMouseMove)
       cancelAnimationFrame(animId)
+      restartRef.current = null
     }
   }, [width, height])
 

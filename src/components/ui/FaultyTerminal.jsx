@@ -245,13 +245,21 @@ export default function FaultyTerminal({
   ...rest
 }) {
   const containerRef = useRef(null)
-  const isVisibleRef = useViewportVisibility(containerRef)
+  const rafRef = useRef(0)
+  const restartRef = useRef(null)
+
+  const onBecomeVisible = useCallback(() => {
+    if (restartRef.current && !rafRef.current) {
+      rafRef.current = requestAnimationFrame(restartRef.current)
+    }
+  }, [])
+
+  const isVisibleRef = useViewportVisibility(containerRef, { onBecomeVisible })
   const programRef = useRef(null)
   const rendererRef = useRef(null)
   const mouseRef = useRef({ x: 0.5, y: 0.5 })
   const smoothMouseRef = useRef({ x: 0.5, y: 0.5 })
   const frozenTimeRef = useRef(0)
-  const rafRef = useRef(0)
   const loadAnimationStartRef = useRef(0)
   const timeOffsetRef = useRef(Math.random() * 100)
 
@@ -338,8 +346,10 @@ export default function FaultyTerminal({
     resize()
 
     const update = (t) => {
-      rafRef.current = requestAnimationFrame(update)
-      if (!isVisibleRef.current) return
+      if (!isVisibleRef.current) {
+        rafRef.current = 0
+        return
+      }
       if (pageLoadAnimation && loadAnimationStartRef.current === 0) {
         loadAnimationStartRef.current = t
       }
@@ -372,7 +382,9 @@ export default function FaultyTerminal({
       }
 
       renderer.render({ scene: mesh })
+      rafRef.current = requestAnimationFrame(update)
     }
+    restartRef.current = update
     rafRef.current = requestAnimationFrame(update)
     ctn.appendChild(gl.canvas)
 
@@ -380,6 +392,8 @@ export default function FaultyTerminal({
 
     return () => {
       cancelAnimationFrame(rafRef.current)
+      rafRef.current = 0
+      restartRef.current = null
       resizeObserver.disconnect()
       if (mouseReact) ctn.removeEventListener('mousemove', handleMouseMove)
       if (gl.canvas.parentElement === ctn) ctn.removeChild(gl.canvas)
