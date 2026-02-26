@@ -9,6 +9,7 @@ export default function CustomCursor() {
   const [hovering, setHovering] = useState(false)
   const [visible, setVisible] = useState(false)
   const animRef = useRef(null)
+  const runningRef = useRef(false)
 
   useEffect(() => {
     const isMobile = window.matchMedia('(pointer: coarse)').matches
@@ -18,6 +19,10 @@ export default function CustomCursor() {
       mouse.current.x = e.clientX
       mouse.current.y = e.clientY
       if (!visible) setVisible(true)
+      if (!runningRef.current) {
+        runningRef.current = true
+        animRef.current = requestAnimationFrame(animate)
+      }
     }
 
     function handleOver(e) {
@@ -69,10 +74,15 @@ export default function CustomCursor() {
         }
       })
 
+      const dx = Math.abs(mouse.current.x - pos.current.x)
+      const dy = Math.abs(mouse.current.y - pos.current.y)
+      if (dx < 0.5 && dy < 0.5) {
+        runningRef.current = false
+        return
+      }
+
       animRef.current = requestAnimationFrame(animate)
     }
-
-    animRef.current = requestAnimationFrame(animate)
 
     return () => {
       window.removeEventListener('mousemove', handleMove)
@@ -80,6 +90,7 @@ export default function CustomCursor() {
       document.removeEventListener('mouseout', handleOut)
       document.removeEventListener('mouseleave', handleLeave)
       if (animRef.current) cancelAnimationFrame(animRef.current)
+      runningRef.current = false
     }
   }, [visible])
 

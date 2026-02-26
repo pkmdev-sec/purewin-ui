@@ -1,5 +1,3 @@
-import { useEffect, useRef } from 'react'
-
 /**
  * ShimmerButton — React port of inspira-ui's ShimmerButton.vue
  * Button with rotating conic gradient shimmer border effect.
@@ -17,27 +15,6 @@ export default function ShimmerButton({
   href,
   as: Tag,
 }) {
-  const cssId = useRef(`shim-${Math.random().toString(36).slice(2, 6)}`).current
-
-  useEffect(() => {
-    const css = `
-      @keyframes ${cssId}-slide {
-        to { transform: translate(calc(100cqw - 100%), 0); }
-      }
-      @keyframes ${cssId}-spin {
-        0%   { transform: translateZ(0) rotate(0deg); }
-        15%, 35% { transform: translateZ(0) rotate(90deg); }
-        65%, 85% { transform: translateZ(0) rotate(270deg); }
-        100% { transform: translateZ(0) rotate(360deg); }
-      }
-      .${cssId}-slide { animation: ${cssId}-slide ${shimmerDuration} ease-in-out infinite alternate; }
-      .${cssId}-spin  { animation: ${cssId}-spin calc(${shimmerDuration} * 2) infinite linear; }
-    `
-    const el = document.createElement('style')
-    el.textContent = css
-    document.head.appendChild(el)
-    return () => document.head.removeChild(el)
-  }, [cssId, shimmerDuration])
 
   const vars = {
     '--spread': '90deg',
@@ -83,21 +60,21 @@ export default function ShimmerButton({
         filter: 'blur(2px)',
       }}>
         <div
-          className={`${cssId}-slide`}
           style={{
             position: 'absolute', inset: 0,
             aspectRatio: '1',
             height: '100cqh',
             borderRadius: 0,
+            animation: 'shimmer-slide var(--speed) ease-in-out infinite alternate',
           }}
         >
           <div
-            className={`${cssId}-spin`}
             style={{
               position: 'absolute',
               inset: '-100%',
               width: 'auto',
               background: `conic-gradient(from calc(270deg - (var(--spread) * 0.5)), transparent 0, var(--shimmer-color) var(--spread), transparent var(--spread))`,
+              animation: 'shimmer-spin calc(var(--speed) * 2) infinite linear',
             }}
           />
         </div>

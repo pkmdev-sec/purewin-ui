@@ -17,6 +17,8 @@ export default defineConfig({
           'vendor-framer': ['framer-motion'],
           'vendor-three': ['three', '@react-three/fiber', '@react-three/postprocessing'],
           'vendor-lenis': ['lenis'],
+          'vendor-spline': ['@splinetool/react-spline', '@splinetool/runtime'],
+          'vendor-ogl': ['ogl'],
         },
       },
     },

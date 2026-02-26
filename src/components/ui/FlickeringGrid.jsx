@@ -42,6 +42,16 @@ export default function FlickeringGrid({
       if (!colorBase.includes('rgba')) colorBase = `rgba(139,92,246,`
     }
 
+    // Pre-compute palette of color strings to avoid template literals in draw loop
+    const PALETTE_SIZE = 25
+    const palette = new Array(PALETTE_SIZE)
+    for (let i = 0; i < PALETTE_SIZE; i++) {
+      const opacity = (i / (PALETTE_SIZE - 1)) * maxOpacity
+      palette[i] = `${colorBase}${opacity})`
+    }
+    const paletteMax = PALETTE_SIZE - 1
+    const paletteDivisor = maxOpacity > 0 ? maxOpacity : 1
+
     function setup() {
       dpr = Math.min(window.devicePixelRatio || 1, 2)
       const w = container.clientWidth
@@ -89,7 +99,7 @@ export default function FlickeringGrid({
               squareSize * dpr,
               squareSize * dpr,
             )
-            ctx.fillStyle = `${colorBase}${squares[idx]})`
+            ctx.fillStyle = palette[Math.min(Math.round((squares[idx] / paletteDivisor) * paletteMax), paletteMax)]
             ctx.fillRect(
               i * (squareSize + gridGap) * dpr,
               j * (squareSize + gridGap) * dpr,
@@ -97,7 +107,7 @@ export default function FlickeringGrid({
               squareSize * dpr,
             )
           } else if (needsFullRedraw) {
-            ctx.fillStyle = `${colorBase}${squares[idx]})`
+            ctx.fillStyle = palette[Math.min(Math.round((squares[idx] / paletteDivisor) * paletteMax), paletteMax)]
             ctx.fillRect(
               i * (squareSize + gridGap) * dpr,
               j * (squareSize + gridGap) * dpr,

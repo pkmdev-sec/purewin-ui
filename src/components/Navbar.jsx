@@ -13,6 +13,7 @@ const NAV_LINKS = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const isTouchRef = useRef(typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches)
 
   const tickingRef = useRef(false)
 
@@ -50,9 +51,9 @@ export default function Navbar() {
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '0 clamp(16px, 4vw, 48px)',
-        backgroundColor: scrolled ? 'rgba(5, 6, 10, 0.92)' : 'transparent',
-        backdropFilter: scrolled ? 'blur(20px)' : 'none',
-        WebkitBackdropFilter: scrolled ? 'blur(20px)' : 'none',
+        backgroundColor: scrolled ? (isTouchRef.current ? 'rgba(5, 6, 10, 0.97)' : 'rgba(5, 6, 10, 0.92)') : 'transparent',
+        backdropFilter: scrolled && !isTouchRef.current ? 'blur(20px)' : 'none',
+        WebkitBackdropFilter: scrolled && !isTouchRef.current ? 'blur(20px)' : 'none',
         borderBottom: scrolled ? '1px solid rgba(139, 92, 246, 0.08)' : '1px solid transparent',
         transition: 'background-color 0.3s, backdrop-filter 0.3s, border-color 0.3s',
         fontFamily: 'var(--font-mono)',

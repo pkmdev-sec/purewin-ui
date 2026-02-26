@@ -33,6 +33,8 @@ export default function HoloSun({ width = 600, height = 600, style = {} }) {
       })
     }
 
+    const projected = new Float32Array(PARTICLE_COUNT * 3)
+
     let rotX = 0
     let rotY = 0
     let mouseVX = 0
@@ -78,7 +80,8 @@ export default function HoloSun({ width = 600, height = 600, style = {} }) {
       const breath = 1 + Math.sin(frame * 0.02) * 0.015
       const r = sphereR * breath
 
-      const projected = particles.map(p => {
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        const p = particles[i]
         const cosY = Math.cos(rotY), sinY = Math.sin(rotY)
         let x1 = p.ox * cosY - p.oz * sinY
         let z1 = p.ox * sinY + p.oz * cosY
@@ -87,14 +90,15 @@ export default function HoloSun({ width = 600, height = 600, style = {} }) {
         let y2 = y1 * cosX - z1 * sinX
         let z2 = y1 * sinX + z1 * cosX
         const perspective = 350 / (350 + z2 * r)
-        return {
-          px: cx + x1 * r * perspective,
-          py: cy + y2 * r * perspective,
-          alpha: (z2 + 1) / 2,
-        }
-      })
+        projected[i * 3] = cx + x1 * r * perspective
+        projected[i * 3 + 1] = cy + y2 * r * perspective
+        projected[i * 3 + 2] = (z2 + 1) / 2
+      }
 
-      projected.forEach(({ px, py, alpha }) => {
+      for (let i = 0; i < PARTICLE_COUNT; i++) {
+        const px = projected[i * 3]
+        const py = projected[i * 3 + 1]
+        const alpha = projected[i * 3 + 2]
         let rf, gf, bf
         if (alpha < 0.4) {
           rf = Math.floor(30 + alpha * 100)
@@ -115,7 +119,7 @@ export default function HoloSun({ width = 600, height = 600, style = {} }) {
         ctx.beginPath()
         ctx.arc(px, py, size, 0, Math.PI * 2)
         ctx.fill()
-      })
+      }
 
     }
 

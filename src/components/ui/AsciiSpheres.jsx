@@ -108,7 +108,7 @@ function Scene({ paused }) {
       })}
       {!paused && (
         <EffectComposer>
-          <Bloom intensity={0.3} luminanceThreshold={0.5} luminanceSmoothing={0.9} mipmapBlur />
+          <Bloom intensity={0.3} luminanceThreshold={0.5} luminanceSmoothing={0.9} />
         </EffectComposer>
       )}
     </>
