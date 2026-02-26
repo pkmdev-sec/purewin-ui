@@ -210,10 +210,13 @@ export default function Preloader({ finished }) {
               borderRadius: '1px', overflow: 'hidden', position: 'relative',
             }}>
               <motion.div
-                animate={{ width: `${progressVal}%` }}
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: progressVal / 100 }}
                 transition={{ duration: 0.15 }}
                 style={{
                   height: '100%',
+                  width: '100%',
+                  transformOrigin: 'left',
                   background: 'linear-gradient(to right, #6d28d9, #8b5cf6, #00ffd5)',
                   borderRadius: '1px',
                   boxShadow: '0 0 12px rgba(139,92,246,0.8)',
