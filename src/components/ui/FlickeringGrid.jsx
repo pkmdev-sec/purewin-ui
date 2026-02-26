@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useCallback } from 'react'
 import { useViewportVisibility } from '../../hooks/useViewportVisibility'
 
 /**
@@ -15,7 +15,13 @@ export default function FlickeringGrid({
 }) {
   const containerRef = useRef(null)
   const canvasRef = useRef(null)
-  const isVisibleRef = useViewportVisibility(containerRef)
+  const restartRef = useRef(null)
+
+  const onBecomeVisible = useCallback(() => {
+    if (restartRef.current) restartRef.current(performance.now())
+  }, [])
+
+  const isVisibleRef = useViewportVisibility(containerRef, { onBecomeVisible })
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -72,7 +78,6 @@ export default function FlickeringGrid({
     let fullRedrawCounter = 0
 
     function draw(time) {
-      animId = requestAnimationFrame(draw)
       if (!isVisibleRef.current) return
 
       const delta = Math.min((time - lastTime) / 1000, 0.1)
@@ -117,15 +122,17 @@ export default function FlickeringGrid({
           }
         }
       }
+      animId = requestAnimationFrame(draw)
     }
 
+    restartRef.current = draw
     setup()
     animId = requestAnimationFrame(draw)
 
     const ro = new ResizeObserver(() => setup())
     ro.observe(container)
 
-    return () => { cancelAnimationFrame(animId); ro.disconnect() }
+    return () => { cancelAnimationFrame(animId); ro.disconnect(); restartRef.current = null }
   }, [squareSize, gridGap, flickerChance, color, maxOpacity])
 
   return (
