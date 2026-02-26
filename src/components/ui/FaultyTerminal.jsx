@@ -1,6 +1,7 @@
 /* eslint-disable react/no-unknown-property */
 import { Renderer, Program, Mesh, Color, Triangle } from 'ogl'
 import { useEffect, useRef, useMemo, useCallback } from 'react'
+import { useViewportVisibility } from '../../hooks/useViewportVisibility'
 import './FaultyTerminal.css'
 
 const vertexShader = `
@@ -236,7 +237,7 @@ export default function FaultyTerminal({
   tint = '#ffffff',
   mouseReact = true,
   mouseStrength = 0.2,
-  dpr = Math.min(window.devicePixelRatio || 1, 2),
+  dpr = 1,
   pageLoadAnimation = true,
   brightness = 1,
   className = '',
@@ -244,6 +245,7 @@ export default function FaultyTerminal({
   ...rest
 }) {
   const containerRef = useRef(null)
+  const isVisibleRef = useViewportVisibility(containerRef)
   const programRef = useRef(null)
   const rendererRef = useRef(null)
   const mouseRef = useRef({ x: 0.5, y: 0.5 })
@@ -337,7 +339,7 @@ export default function FaultyTerminal({
 
     const update = (t) => {
       rafRef.current = requestAnimationFrame(update)
-
+      if (!isVisibleRef.current) return
       if (pageLoadAnimation && loadAnimationStartRef.current === 0) {
         loadAnimationStartRef.current = t
       }

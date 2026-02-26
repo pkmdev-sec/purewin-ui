@@ -114,6 +114,8 @@ body::after {
     rgba(139, 92, 246, 0.008) 2px,
     rgba(139, 92, 246, 0.008) 4px
   );
+  will-change: transform;
+  contain: layout style;
 }
 
 /* Dot grid substrate */
@@ -128,6 +130,8 @@ body::before {
     transparent 1px
   );
   background-size: 24px 24px;
+  will-change: transform;
+  contain: layout style;
 }
 
 /* Custom scrollbar */
@@ -192,8 +196,8 @@ button {
 }
 
 @keyframes pulse-dot {
-  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(139,92,246,0.4); }
-  50% { opacity: 0.7; box-shadow: 0 0 0 4px rgba(139,92,246,0); }
+	0%, 100% { opacity: 1; transform: scale(1); }
+	50% { opacity: 0.7; transform: scale(1.3); }
 }
 
 @keyframes ambient-pulse {
@@ -213,8 +217,8 @@ button {
 }
 
 @keyframes shimmer {
-  0% { left: -150%; }
-  100% { left: 150%; }
+	0% { transform: translateX(-250%); }
+	100% { transform: translateX(250%); }
 }
 
 @keyframes scan-line {
@@ -296,6 +300,7 @@ button {
   animation: scan-line 10s linear infinite;
   top: 0;
   left: 0;
+  will-change: transform;
 }
 
 /* ===== SHIMMER EFFECT ===== */
@@ -309,7 +314,8 @@ button {
   top: 0; bottom: 0;
   width: 60px;
   background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-  left: -60px;
+  left: 0;
+  transform: translateX(-100%);
   transition: none;
 }
 .shimmer-card:hover::after {
@@ -383,12 +389,8 @@ button {
 
 /* Utility animations */
 @keyframes pulse-green {
-  0%, 100% {
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
-  }
-  50% {
-    box-shadow: 0 0 40px rgba(139, 92, 246, 0.6), 0 0 80px rgba(139, 92, 246, 0.2);
-  }
+	0%, 100% { transform: scale(1); opacity: 0.9; }
+	50% { transform: scale(1.03); opacity: 1; }
 }
 
 @keyframes blink {
@@ -457,4 +459,59 @@ button {
   #hero { flex-direction: column !important; }
   .hero-text-col { flex: 0 0 auto; width: 100%; padding-top: 100px; }
   .hero-spline-col { flex: 0 0 auto; width: 100%; min-height: 55vw; }
+}
+
+
+/* ===== STATIC KEYFRAMES (moved from runtime injection) ===== */
+@keyframes shimmer-slide {
+	to { transform: translate(calc(100cqw - 100%), 0); }
+}
+@keyframes shimmer-spin {
+	0%   { transform: translateZ(0) rotate(0deg); }
+	15%, 35% { transform: translateZ(0) rotate(90deg); }
+	65%, 85% { transform: translateZ(0) rotate(270deg); }
+	100% { transform: translateZ(0) rotate(360deg); }
+}
+@keyframes glitch-clip-1 {
+	0% { clip-path: inset(20% 0 60% 0); transform: translate(-3px, 2px); }
+	20% { clip-path: inset(50% 0 20% 0); transform: translate(3px, -1px); }
+	40% { clip-path: inset(10% 0 70% 0); transform: translate(-2px, 1px); }
+	60% { clip-path: inset(80% 0 5% 0); transform: translate(2px, -2px); }
+	80% { clip-path: inset(30% 0 40% 0); transform: translate(-1px, 2px); }
+	100% { clip-path: inset(60% 0 10% 0); transform: translate(1px, -1px); }
+}
+@keyframes glitch-clip-2 {
+	0% { clip-path: inset(65% 0 5% 0); transform: translate(3px, -2px); }
+	20% { clip-path: inset(15% 0 55% 0); transform: translate(-3px, 1px); }
+	40% { clip-path: inset(45% 0 25% 0); transform: translate(2px, 2px); }
+	60% { clip-path: inset(5% 0 75% 0); transform: translate(-2px, -1px); }
+	80% { clip-path: inset(70% 0 10% 0); transform: translate(1px, 1px); }
+	100% { clip-path: inset(35% 0 35% 0); transform: translate(-1px, -2px); }
+}
+@keyframes flip-enter {
+	from { opacity: 0; transform: translateY(10px); filter: blur(8px); }
+	to   { opacity: 1; transform: translateY(0);    filter: blur(0);   }
+}
+@keyframes flip-leave {
+	from { opacity: 1; transform: scale(1);  filter: blur(0);   }
+	to   { opacity: 0; transform: scale(2);  filter: blur(8px); }
+}
+@keyframes marquee-scroll {
+	from { transform: translateX(0); }
+	to { transform: translateX(-50%); }
+}
+@keyframes sparkle-fade {
+	0% { transform: scale(0) rotate(0deg); opacity: 1; }
+	50% { transform: scale(1) rotate(90deg); opacity: 1; }
+	100% { transform: scale(0) rotate(180deg); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*, *::before, *::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+	.scan-line { display: none; }
 }
