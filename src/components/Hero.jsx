@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, Suspense, lazy } from 'react'
+import { useRef, Suspense, lazy } from 'react'
 import { useDeviceTier } from '../hooks/useDeviceTier'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { Download, ExternalLink, ChevronDown } from 'lucide-react'
@@ -53,18 +53,6 @@ export default function Hero() {
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
   const cardY = useTransform(scrollYProgress, [0, 1], [0, -40])
   const cardOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0])
-  const [heroVisible, setHeroVisible] = useState(true)
-
-  useEffect(() => {
-    const el = heroRef.current
-    if (!el) return
-    const observer = new IntersectionObserver(
-      ([entry]) => setHeroVisible(entry.isIntersecting),
-      { rootMargin: '200px' }
-    )
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [])
 
   return (
     <section
@@ -86,7 +74,7 @@ export default function Hero() {
             width: '100%', height: '100%',
             background: 'radial-gradient(ellipse at 60% 50%, rgba(139,92,246,0.15) 0%, transparent 70%)',
           }} />
-        ) : heroVisible ? (
+        ) : (
           <Suspense fallback={
             <div style={{
               width: '100%', height: '100%',
@@ -99,8 +87,6 @@ export default function Hero() {
           }>
             <Spline scene={SPLINE_SCENE} style={{ width: '100%', height: '100%' }} />
           </Suspense>
-        ) : (
-          <div style={{ width: '100%', height: '100%', background: '#000' }} />
         )}
       </div>
 
