@@ -11,6 +11,8 @@ export default function SparklesText({
 }) {
   const [sparkles, setSparkles] = useState([])
   const counterRef = useRef(0)
+  const containerRef = useRef(null)
+  const visibleRef = useRef(false)
 
   function createSparkle() {
     return {
@@ -27,7 +29,18 @@ export default function SparklesText({
   }
 
   useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(([entry]) => {
+      visibleRef.current = entry.isIntersecting
+    })
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
     const interval = setInterval(() => {
+      if (!visibleRef.current) return
       const now = Date.now()
       setSparkles(prev => {
         const fresh = prev.filter(s => now - s.createdAt < 700)
@@ -41,7 +54,7 @@ export default function SparklesText({
   }, [sparkleColor, sparkleCount])
 
   return (
-    <span className={className} style={{ position: 'relative', display: 'inline-block', ...style }}>
+    <span ref={containerRef} className={className} style={{ position: 'relative', display: 'inline-block', ...style }}>
       {sparkles.map(s => (
         <span
           key={s.id}
@@ -66,13 +79,6 @@ export default function SparklesText({
         </span>
       ))}
       <strong style={{ fontWeight: 'inherit', position: 'relative', zIndex: 1 }}>{text}</strong>
-      <style>{`
-        @keyframes sparkle-fade {
-          0% { transform: scale(0) rotate(0deg); opacity: 1; }
-          50% { transform: scale(1) rotate(90deg); opacity: 1; }
-          100% { transform: scale(0) rotate(180deg); opacity: 0; }
-        }
-      `}</style>
     </span>
   )
 }

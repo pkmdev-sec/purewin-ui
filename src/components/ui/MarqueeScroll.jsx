@@ -1,4 +1,3 @@
-import { useRef } from 'react'
 
 export default function MarqueeScroll({
   items = [],
@@ -60,12 +59,6 @@ export default function MarqueeScroll({
         ))}
       </div>
 
-      <style>{`
-        @keyframes marquee-scroll {
-          from { transform: translateX(0); }
-          to { transform: translateX(-50%); }
-        }
-      `}</style>
     </div>
   )
 }

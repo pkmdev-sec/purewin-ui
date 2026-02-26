@@ -44,13 +44,11 @@ export default function App() {
         <Navbar />
         <Hero />
         <TracingBeam style={{ padding: '0 clamp(16px, 4vw, 60px)' }}>
-          <Suspense fallback={null}>
-            <Features />
-            <Terminal />
-            <Stats />
-            <Download />
-            <Footer />
-          </Suspense>
+          <Suspense fallback={null}><Features /></Suspense>
+          <Suspense fallback={null}><Terminal /></Suspense>
+          <Suspense fallback={null}><Stats /></Suspense>
+          <Suspense fallback={null}><Download /></Suspense>
+          <Suspense fallback={null}><Footer /></Suspense>
         </TracingBeam>
       </div>
     </>

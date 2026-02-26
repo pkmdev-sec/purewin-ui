@@ -130,46 +130,64 @@ export default function SentinelTerminal({ autoPlay = false }) {
     }
   }, [])
 
+  const bufferRef = useRef('')
+  const rafPending = useRef(false)
+
   const typewriterOutput = useCallback((text, callback) => {
     setTyping(true)
     const chars = text.split('')
     let idx = 0
-    let buffer = ''
+    bufferRef.current = ''
 
     function step() {
-      if (idx < chars.length) {
-        buffer += chars[idx]
+      bufferRef.current += chars[idx]
+      idx++
+      const chunk = 3 + Math.floor(Math.random() * 5)
+      for (let i = 1; i < chunk && idx < chars.length; i++) {
+        bufferRef.current += chars[idx]
         idx++
-        const chunk = 3 + Math.floor(Math.random() * 5)
-        for (let i = 1; i < chunk && idx < chars.length; i++) {
-          buffer += chars[idx]
-          idx++
+      }
+
+      if (idx < chars.length) {
+        if (!rafPending.current) {
+          rafPending.current = true
+          requestAnimationFrame(() => {
+            rafPending.current = false
+            const buf = bufferRef.current
+            setLines((prev) => {
+              const next = [...prev]
+              if (next[next.length - 1]?.type === 'output-typing') {
+                next[next.length - 1] = { type: 'output-typing', text: buf }
+              } else {
+                next.push({ type: 'output-typing', text: buf })
+              }
+              return next
+            })
+            scrollToBottom()
+          })
         }
-        setLines((prev) => {
-          const next = [...prev]
-          if (next[next.length - 1]?.type === 'output-typing') {
-            next[next.length - 1] = { type: 'output-typing', text: buffer }
-          } else {
-            next.push({ type: 'output-typing', text: buffer })
-          }
-          return next
-        })
         setTimeout(step, 10 + Math.random() * 15)
       } else {
+        // Final flush: cancel any pending rAF and do synchronous update
+        rafPending.current = false
+        const buf = bufferRef.current
         setLines((prev) => {
           const next = [...prev]
           if (next[next.length - 1]?.type === 'output-typing') {
-            next[next.length - 1] = { type: 'output', text: buffer }
+            next[next.length - 1] = { type: 'output', text: buf }
+          } else {
+            next.push({ type: 'output', text: buf })
           }
           return next
         })
+        scrollToBottom()
         setTyping(false)
         if (callback) callback()
       }
     }
 
     step()
-  }, [])
+  }, [scrollToBottom])
 
   const executeCommand = useCallback((cmd, callback) => {
     const trimmed = cmd.trim().toLowerCase()

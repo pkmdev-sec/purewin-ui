@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Github, Menu, X } from 'lucide-react'
 import MagneticButton from './ui/MagneticButton'
@@ -14,9 +14,16 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
 
+  const tickingRef = useRef(false)
+
   useEffect(() => {
     function handleScroll() {
-      setScrolled(window.scrollY > 50)
+      if (tickingRef.current) return
+      tickingRef.current = true
+      requestAnimationFrame(() => {
+        setScrolled(window.scrollY > 50)
+        tickingRef.current = false
+      })
     }
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
@@ -207,14 +214,6 @@ export default function Navbar() {
         )}
       </AnimatePresence>
 
-      {/* Responsive styles injected */}
-      <style>{`
-        @media (max-width: 768px) {
-          .nav-links-desktop { display: none !important; }
-          .nav-github-text { display: none; }
-          .nav-mobile-toggle { display: block !important; }
-        }
-      `}</style>
     </nav>
   )
 }
