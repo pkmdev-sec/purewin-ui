@@ -20,7 +20,7 @@ export default function HoloSun({ width = 600, height = 600, style = {} }) {
     canvas.width = width
     canvas.height = height
 
-    const PARTICLE_COUNT = 2200
+    const PARTICLE_COUNT = 1200
     const cx = width / 2
     const cy = height / 2
     const sphereR = Math.min(width, height) * 0.38
@@ -41,6 +41,8 @@ export default function HoloSun({ width = 600, height = 600, style = {} }) {
 
     const projected = new Float32Array(PARTICLE_COUNT * 3)
 
+    const BUCKET_COUNT = 16
+    const buckets = Array.from({ length: BUCKET_COUNT }, () => [])
     let rotX = 0
     let rotY = 0
     let mouseVX = 0
@@ -88,13 +90,14 @@ export default function HoloSun({ width = 600, height = 600, style = {} }) {
       const breath = 1 + Math.sin(frame * 0.02) * 0.015
       const r = sphereR * breath
 
+      const cosY = Math.cos(rotY), sinY = Math.sin(rotY)
+      const cosX = Math.cos(rotX), sinX = Math.sin(rotX)
+
       for (let i = 0; i < PARTICLE_COUNT; i++) {
         const p = particles[i]
-        const cosY = Math.cos(rotY), sinY = Math.sin(rotY)
         let x1 = p.ox * cosY - p.oz * sinY
         let z1 = p.ox * sinY + p.oz * cosY
         let y1 = p.oy
-        const cosX = Math.cos(rotX), sinX = Math.sin(rotX)
         let y2 = y1 * cosX - z1 * sinX
         let z2 = y1 * sinX + z1 * cosX
         const perspective = 350 / (350 + z2 * r)
@@ -103,10 +106,18 @@ export default function HoloSun({ width = 600, height = 600, style = {} }) {
         projected[i * 3 + 2] = (z2 + 1) / 2
       }
 
+      for (let b = 0; b < BUCKET_COUNT; b++) buckets[b].length = 0
+
       for (let i = 0; i < PARTICLE_COUNT; i++) {
-        const px = projected[i * 3]
-        const py = projected[i * 3 + 1]
         const alpha = projected[i * 3 + 2]
+        const bucketIdx = Math.min(Math.floor(alpha * BUCKET_COUNT), BUCKET_COUNT - 1)
+        buckets[bucketIdx].push(i)
+      }
+
+      for (let b = 0; b < BUCKET_COUNT; b++) {
+        const bucket = buckets[b]
+        if (bucket.length === 0) continue
+        const alpha = (b + 0.5) / BUCKET_COUNT
         let rf, gf, bf
         if (alpha < 0.4) {
           rf = Math.floor(30 + alpha * 100)
@@ -123,10 +134,15 @@ export default function HoloSun({ width = 600, height = 600, style = {} }) {
         }
         const a = 0.2 + alpha * 0.8
         ctx.fillStyle = `rgba(${rf},${gf},${bf},${a})`
-        const size = 0.8 + alpha * 1.2
-        ctx.beginPath()
-        ctx.arc(px, py, size, 0, Math.PI * 2)
-        ctx.fill()
+
+        for (let j = 0; j < bucket.length; j++) {
+          const i = bucket[j]
+          const px = projected[i * 3]
+          const py = projected[i * 3 + 1]
+          const pAlpha = projected[i * 3 + 2]
+          const size = 0.8 + pAlpha * 1.2
+          ctx.fillRect(px - size * 0.5, py - size * 0.5, size, size)
+        }
       }
 
       animId = requestAnimationFrame(render)

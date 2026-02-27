@@ -73,11 +73,6 @@ float fbm(vec2 p)
   
   mat2 modify1 = rotate(time * 0.02);
   f += amp * noise(p);
-  p = modify1 * p * 2.0;
-  amp *= 0.454545;
-  
-  mat2 modify2 = rotate(time * 0.08);
-  f += amp * noise(p);
   
   return f;
 }
@@ -166,11 +161,12 @@ vec3 getColor(vec2 p){
     float middle = digit(p);
     
     const float off = 0.002;
-    float sum = digit(p + vec2(-off, -off)) + digit(p + vec2(0.0, -off)) + digit(p + vec2(off, -off)) +
-                digit(p + vec2(-off, 0.0)) + digit(p + vec2(0.0, 0.0)) + digit(p + vec2(off, 0.0)) +
-                digit(p + vec2(-off, off)) + digit(p + vec2(0.0, off)) + digit(p + vec2(off, off));
+    float sum = digit(p + vec2(0.0, -off)) +
+                digit(p + vec2(-off, 0.0)) + digit(p + vec2(0.0, 0.0)) +
+                digit(p + vec2(off, 0.0)) +
+                digit(p + vec2(0.0, off));
     
-    vec3 baseColor = vec3(0.9) * middle + sum * 0.1 * vec3(1.0) * bar;
+    vec3 baseColor = vec3(0.9) * middle + sum * 0.18 * vec3(1.0) * bar;
     return baseColor;
 }
 
