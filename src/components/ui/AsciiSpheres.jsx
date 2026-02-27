@@ -137,3 +137,5 @@ export default function AsciiSpheres({ style = {} }) {
       )}
     </div>
   )
+
+}

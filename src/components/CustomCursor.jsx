@@ -6,7 +6,7 @@ export default function CustomCursor() {
   const mouse = useRef({ x: -100, y: -100 })
   const pos = useRef({ x: -100, y: -100 })
   const trail = useRef(Array.from({ length: 5 }, () => ({ x: -100, y: -100 })))
-  const [hovering, setHovering] = useState(false)
+  const hoveringRef = useRef(false)
   const [visible, setVisible] = useState(false)
   const animRef = useRef(null)
   const runningRef = useRef(false)
@@ -15,10 +15,26 @@ export default function CustomCursor() {
     const isMobile = window.matchMedia('(pointer: coarse)').matches
     if (isMobile) return
 
+    function applyHoverStyle(isHover) {
+      if (!dotRef.current) return
+      const s = dotRef.current.style
+      if (isHover) {
+        s.width = '40px'
+        s.height = '40px'
+        s.backgroundColor = 'transparent'
+        s.border = '2px solid #fff'
+      } else {
+        s.width = '8px'
+        s.height = '8px'
+        s.backgroundColor = '#fff'
+        s.border = 'none'
+      }
+    }
+
     function handleMove(e) {
       mouse.current.x = e.clientX
       mouse.current.y = e.clientY
-      if (!visible) setVisible(true)
+      setVisible(true)
       if (!runningRef.current) {
         runningRef.current = true
         animRef.current = requestAnimationFrame(animate)
@@ -30,23 +46,28 @@ export default function CustomCursor() {
       if (
         el.tagName === 'A' ||
         el.tagName === 'BUTTON' ||
-        el.closest('a') ||
-        el.closest('button') ||
+        el.matches?.('a *, button *') ||
         el.style?.cursor === 'pointer'
       ) {
-        setHovering(true)
+        if (!hoveringRef.current) {
+          hoveringRef.current = true
+          applyHoverStyle(true)
+        }
       }
     }
 
     function handleOut() {
-      setHovering(false)
+      if (hoveringRef.current) {
+        hoveringRef.current = false
+        applyHoverStyle(false)
+      }
     }
 
     function handleLeave() {
       setVisible(false)
     }
 
-    window.addEventListener('mousemove', handleMove)
+    window.addEventListener('mousemove', handleMove, { passive: true })
     document.addEventListener('mouseover', handleOver)
     document.addEventListener('mouseout', handleOut)
     document.addEventListener('mouseleave', handleLeave)
@@ -92,7 +113,7 @@ export default function CustomCursor() {
       if (animRef.current) cancelAnimationFrame(animRef.current)
       runningRef.current = false
     }
-  }, [visible])
+  }, [])
 
   const isMobile = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
   if (isMobile) return null
@@ -105,16 +126,15 @@ export default function CustomCursor() {
           position: 'fixed',
           top: 0,
           left: 0,
-          width: hovering ? '40px' : '8px',
-          height: hovering ? '40px' : '8px',
+          width: '8px',
+          height: '8px',
           borderRadius: '50%',
-          backgroundColor: hovering ? 'transparent' : '#fff',
-          border: hovering ? '2px solid #fff' : 'none',
+          backgroundColor: '#fff',
+          border: 'none',
           pointerEvents: 'none',
           zIndex: 99999,
-          mixBlendMode: 'difference',
           transition: 'width 0.2s ease, height 0.2s ease, background-color 0.2s ease, border 0.2s ease',
-          opacity: visible ? 1 : 0,
+          opacity: visible ? 0.9 : 0,
           willChange: 'transform',
         }}
       />
@@ -132,7 +152,6 @@ export default function CustomCursor() {
             backgroundColor: '#fff',
             pointerEvents: 'none',
             zIndex: 99998,
-            mixBlendMode: 'difference',
             opacity: 0,
             willChange: 'transform',
           }}

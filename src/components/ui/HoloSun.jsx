@@ -110,7 +110,7 @@ export default function HoloSun({ width = 600, height = 600, style = {} }) {
 
       for (let i = 0; i < PARTICLE_COUNT; i++) {
         const alpha = projected[i * 3 + 2]
-        const bucketIdx = Math.min(Math.floor(alpha * BUCKET_COUNT), BUCKET_COUNT - 1)
+        const bucketIdx = Math.max(0, Math.min(Math.floor(alpha * BUCKET_COUNT), BUCKET_COUNT - 1))
         buckets[bucketIdx].push(i)
       }
 

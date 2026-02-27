@@ -70,8 +70,6 @@ float fbm(vec2 p)
   f += amp * noise(p);
   p = modify0 * p * 2.0;
   amp *= 0.454545;
-  
-  mat2 modify1 = rotate(time * 0.02);
   f += amp * noise(p);
   
   return f;
@@ -397,12 +395,13 @@ export default function FaultyTerminal({
       loadAnimationStartRef.current = 0
       timeOffsetRef.current = Math.random() * 100
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     dpr,
     pause,
     timeScale,
     scale,
-    gridMul,
+    gridMul[0], gridMul[1],
     digitSize,
     scanlineIntensity,
     glitchAmount,
