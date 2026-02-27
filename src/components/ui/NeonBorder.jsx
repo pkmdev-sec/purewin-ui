@@ -28,7 +28,8 @@ export default function NeonBorder({
           position: 'absolute', inset: 0,
           overflow: 'hidden', borderRadius,
           zIndex: 0, transformOrigin: 'center',
-          filter: `blur(3px) drop-shadow(0 0 2px ${color1}44)`,
+          boxShadow: `0 0 6px 2px ${color1}33`,
+          willChange: 'transform',
           animation: shouldAnimate ? `neon-spin ${duration}s linear infinite` : 'none',
         }}
       >
@@ -44,7 +45,8 @@ export default function NeonBorder({
           position: 'absolute', inset: 0,
           overflow: 'hidden', borderRadius,
           zIndex: 0, transformOrigin: 'center',
-          filter: `blur(3px) drop-shadow(0 0 2px ${color2}44)`,
+          boxShadow: `0 0 6px 2px ${color2}33`,
+          willChange: 'transform',
           animation: shouldAnimate ? `neon-spin ${duration}s linear infinite` : 'none',
           animationDelay: shouldAnimate ? `-${duration / 2}s` : undefined,
         }}

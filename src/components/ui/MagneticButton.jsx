@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react'
-import { motion } from 'framer-motion'
+import { useRef } from 'react'
+import { motion, useMotionValue, useSpring } from 'framer-motion'
 
 export default function MagneticButton({
   children,
@@ -9,20 +9,23 @@ export default function MagneticButton({
   style = {},
 }) {
   const btnRef = useRef(null)
-  const [position, setPosition] = useState({ x: 0, y: 0 })
+  const x = useMotionValue(0)
+  const y = useMotionValue(0)
+  const springX = useSpring(x, { stiffness: 150, damping: 15, mass: 0.1 })
+  const springY = useSpring(y, { stiffness: 150, damping: 15, mass: 0.1 })
 
   function handleMouseMove(e) {
     if (!btnRef.current) return
     const rect = btnRef.current.getBoundingClientRect()
     const centerX = rect.left + rect.width / 2
     const centerY = rect.top + rect.height / 2
-    const dx = e.clientX - centerX
-    const dy = e.clientY - centerY
-    setPosition({ x: dx * 0.5, y: dy * 0.5 })
+    x.set((e.clientX - centerX) * 0.5)
+    y.set((e.clientY - centerY) * 0.5)
   }
 
   function handleMouseLeave() {
-    setPosition({ x: 0, y: 0 })
+    x.set(0)
+    y.set(0)
   }
 
   const isSolid = variant === 'solid'
@@ -65,13 +68,7 @@ export default function MagneticButton({
       onClick={onClick}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      animate={{ x: position.x, y: position.y }}
-      transition={{
-        type: 'spring',
-        stiffness: 150,
-        damping: 15,
-        mass: 0.1,
-      }}
+      style={{ ...baseStyle, x: springX, y: springY }}
       whileHover={{
         scale: 1.04,
         ...(isSolid
@@ -79,7 +76,6 @@ export default function MagneticButton({
           : { borderColor: 'rgba(255,255,255,0.5)' }),
       }}
       whileTap={{ scale: 0.96 }}
-      style={baseStyle}
     >
       {children}
     </Component>

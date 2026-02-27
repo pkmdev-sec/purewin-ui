@@ -79,10 +79,7 @@ export default function GlareCard({ children, style = {} }) {
           borderRadius: '20px',
           overflow: 'hidden',
           position: 'relative',
-          background: 'linear-gradient(145deg, rgba(14,8,32,0.45) 0%, rgba(8,4,20,0.52) 100%)',
-          border: '1px solid rgba(139,92,246,0.18)',
-          backdropFilter: 'blur(24px) saturate(1.4)',
-          WebkitBackdropFilter: 'blur(24px) saturate(1.4)',
+          background: 'linear-gradient(145deg, rgba(14,8,32,0.85) 0%, rgba(8,4,20,0.92) 100%)',
           boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
           transition: 'transform 400ms ease, border-color 400ms, box-shadow 400ms',
         }}
