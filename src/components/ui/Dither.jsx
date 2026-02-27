@@ -274,39 +274,46 @@ export default function Dither({
   mouseRadius = 1
 }) {
   const containerRef = useRef(null);
+  const [mounted, setMounted] = useState(false);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
     const observer = new IntersectionObserver(
-      ([entry]) => setVisible(entry.isIntersecting),
-      { rootMargin: '200px' }
+      ([entry]) => {
+        const isVis = entry.isIntersecting;
+        setVisible(isVis);
+        if (isVis && !mounted) setMounted(true);
+      },
+      { rootMargin: '400px' }
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, []);
+  }, [mounted]);
 
   return (
     <div ref={containerRef} className="dither-container">
-      <Canvas
-        camera={{ position: [0, 0, 6] }}
-        dpr={1}
-        gl={{ antialias: false, preserveDrawingBuffer: false }}
-        frameloop={visible ? 'always' : 'never'}
-      >
-        <DitheredWaves
-          waveSpeed={waveSpeed}
-          waveFrequency={waveFrequency}
-          waveAmplitude={waveAmplitude}
-          waveColor={waveColor}
-          colorNum={colorNum}
-          pixelSize={pixelSize}
-          disableAnimation={disableAnimation}
-          enableMouseInteraction={enableMouseInteraction}
-          mouseRadius={mouseRadius}
-        />
-      </Canvas>
+      {mounted && (
+        <Canvas
+          camera={{ position: [0, 0, 6] }}
+          dpr={1}
+          gl={{ antialias: false, preserveDrawingBuffer: false }}
+          frameloop={visible ? 'always' : 'never'}
+        >
+          <DitheredWaves
+            waveSpeed={waveSpeed}
+            waveFrequency={waveFrequency}
+            waveAmplitude={waveAmplitude}
+            waveColor={waveColor}
+            colorNum={colorNum}
+            pixelSize={pixelSize}
+            disableAnimation={disableAnimation}
+            enableMouseInteraction={enableMouseInteraction}
+            mouseRadius={mouseRadius}
+          />
+        </Canvas>
+      )}
     </div>
   );
 }

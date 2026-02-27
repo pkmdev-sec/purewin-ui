@@ -1,6 +1,5 @@
 import { useRef, useState, useEffect } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { EffectComposer, Bloom } from '@react-three/postprocessing'
 
 function SimpleFloat({ speed = 1, rotationIntensity = 0.5, floatIntensity = 0.8, children }) {
   const groupRef = useRef()
@@ -86,12 +85,6 @@ const OBJECTS = [
   { type: 'octa', position: [-3.8, -0.5, -2], size: 1.0, color: '#0a1a30', speed: 0.45 },
   { type: 'sphere', position: [1.8, -2.8, -3], size: 1.4, color: '#102a1a', speed: 0.35 },
   { type: 'torus', position: [-1, 1, -4], size: 1.6, color: '#1a1a30', speed: 0.25 },
-  { type: 'sphere', position: [2.5, 2.8, -3], size: 0.9, color: '#1a2a40', speed: 0.55 },
-  { type: 'sphere', position: [-1.5, -3, -4], size: 1.2, color: '#2a1a3a', speed: 0.38 },
-  { type: 'torus', position: [5, 0, -2], size: 1.1, color: '#1a1a2e', speed: 0.42 },
-  { type: 'octa', position: [-5, 2, -3], size: 0.8, color: '#0a2030', speed: 0.6 },
-  { type: 'torus', position: [0, 3.5, -5], size: 1.5, color: '#1a2a1a', speed: 0.28 },
-  { type: 'sphere', position: [3, -2.5, -2.5], size: 0.7, color: '#2a1a1a', speed: 0.65 },
 ]
 
 function Scene({ paused }) {
@@ -106,40 +99,41 @@ function Scene({ paused }) {
         if (obj.type === 'octa') return <FloatingOcta key={i} {...obj} paused={paused} />
         return null
       })}
-      {!paused && (
-        <EffectComposer>
-          <Bloom intensity={0.3} luminanceThreshold={0.5} luminanceSmoothing={0.9} />
-        </EffectComposer>
-      )}
     </>
   )
 }
 
 export default function AsciiSpheres({ style = {} }) {
   const containerRef = useRef(null)
+  const [mounted, setMounted] = useState(false)
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
     const el = containerRef.current
     if (!el) return
     const observer = new IntersectionObserver(
-      ([entry]) => setVisible(entry.isIntersecting),
-      { rootMargin: '200px' }
+      ([entry]) => {
+        const isVis = entry.isIntersecting
+        setVisible(isVis)
+        if (isVis && !mounted) setMounted(true)
+      },
+      { rootMargin: '400px' }
     )
     observer.observe(el)
     return () => observer.disconnect()
-  }, [])
+  }, [mounted])
 
   return (
     <div ref={containerRef} style={{ position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none', ...style }}>
-      <Canvas
-        gl={{ alpha: true, antialias: false, powerPreference: 'high-performance' }}
-        camera={{ position: [0, 0, 6], fov: 55 }}
-        dpr={[1, 1.5]}
-        frameloop={visible ? 'always' : 'never'}
-      >
-        <Scene paused={!visible} />
-      </Canvas>
+      {mounted && (
+        <Canvas
+          gl={{ alpha: true, antialias: false, powerPreference: 'high-performance' }}
+          camera={{ position: [0, 0, 6], fov: 55 }}
+          dpr={[1, 1.5]}
+          frameloop={visible ? 'always' : 'never'}
+        >
+          <Scene paused={!visible} />
+        </Canvas>
+      )}
     </div>
   )
-}
