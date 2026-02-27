@@ -1,21 +1,29 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { motion } from 'framer-motion'
 
 
 export default function GlitchText({ text, style = {} }) {
   const [glitching, setGlitching] = useState(false)
+  const timersRef = useRef([])
 
   useEffect(() => {
     function triggerGlitch() {
       setGlitching(true)
-      setTimeout(() => setGlitching(false), 200 + Math.random() * 150)
+      const offTimer = setTimeout(() => setGlitching(false), 200 + Math.random() * 150)
+      timersRef.current.push(offTimer)
 
       const next = 3000 + Math.random() * 5000
-      setTimeout(triggerGlitch, next)
+      const nextTimer = setTimeout(triggerGlitch, next)
+      timersRef.current.push(nextTimer)
     }
 
     const initial = setTimeout(triggerGlitch, 1000 + Math.random() * 2000)
-    return () => clearTimeout(initial)
+    timersRef.current.push(initial)
+
+    return () => {
+      timersRef.current.forEach(id => clearTimeout(id))
+      timersRef.current = []
+    }
   }, [])
 
   const baseStyle = {

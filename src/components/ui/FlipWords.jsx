@@ -36,21 +36,17 @@ export default function FlipWords({
   return (
     <span
       className={className || undefined}
-      style={{ display: 'inline-block', position: 'relative', animation: wordAnimation, ...style }}
+      style={{ display: 'inline-block', position: 'relative', ...style }}
     >
-      {word.split('').map((char, i) => (
-        <span
-          key={`${word}-${i}`}
-          style={{
-            display: 'inline-block',
-            opacity: 0,
-            animation: 'flip-enter 0.2s ease forwards',
-            animationDelay: `${i * 0.04}s`,
-          }}
-        >
-          {char === ' ' ? '\u00a0' : char}
-        </span>
-      ))}
+      <span
+        key={word}
+        style={{
+          display: 'inline-block',
+          animation: wordAnimation,
+        }}
+      >
+        {word}
+      </span>
     </span>
   )
 }

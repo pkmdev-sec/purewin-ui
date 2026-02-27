@@ -100,7 +100,7 @@ const VARIANTS = {
   },
   blue: {
     activeColor: '#93c5fd',
-    gap: 7,
+    gap: 8,
     speed: 30,
     colors: '#93c5fd,#3b82f6,#1E88E5',
     noFocus: false,
@@ -121,14 +121,14 @@ const VARIANTS = {
   },
   purple: {
     activeColor: '#a78bfa',
-    gap: 5,
+    gap: 7,
     speed: 35,
     colors: '#c4b5fd,#8b5cf6,#6d28d9',
     noFocus: false,
   },
   cyan: {
     activeColor: '#5eead4',
-    gap: 6,
+    gap: 8,
     speed: 30,
     colors: '#5eead4,#2dd4bf,#00ffd5',
     noFocus: false,
@@ -203,7 +203,7 @@ export default function PixelCard({
     animationRef.current = requestAnimationFrame(() => doAnimate(fnName));
     const timeNow = performance.now();
     const timePassed = timeNow - timePreviousRef.current;
-    const timeInterval = 1000 / 60;
+    const timeInterval = 1000 / 30;
 
     if (timePassed < timeInterval) return;
     timePreviousRef.current = timeNow - (timePassed % timeInterval);
