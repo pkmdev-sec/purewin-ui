@@ -39,17 +39,19 @@ export default function SparklesText({
   }, [])
 
   useEffect(() => {
+    // Pre-create sparkle pool
+    const pool = Array.from({ length: sparkleCount }, () => createSparkle())
+    setSparkles(pool)
+
     const interval = setInterval(() => {
       if (!visibleRef.current) return
-      const now = Date.now()
-      setSparkles(prev => {
-        const fresh = prev.filter(s => now - s.createdAt < 700)
-        if (fresh.length < sparkleCount) {
-          return [...fresh, createSparkle()]
+      setSparkles(prev => prev.map(s => {
+        if (Date.now() - s.createdAt > 900) {
+          return createSparkle()  // recycle expired sparkle
         }
-        return fresh
-      })
-    }, 120)
+        return s
+      }))
+    }, 250)
     return () => clearInterval(interval)
   }, [sparkleColor, sparkleCount])
 
@@ -63,7 +65,7 @@ export default function SparklesText({
             display: 'block',
             pointerEvents: 'none',
             zIndex: 2,
-            animation: 'sparkle-fade 700ms ease forwards',
+            animation: 'sparkle-fade 900ms ease forwards',
             ...s.style,
           }}
         >

@@ -92,26 +92,15 @@ export default function FlickeringGrid({
         fullRedrawCounter = 0
       }
 
-      for (let i = 0; i < cols; i++) {
-        for (let j = 0; j < rows; j++) {
-          const idx = i * rows + j
-          if (Math.random() < flickerChance * delta) {
-            const oldVal = squares[idx]
-            squares[idx] = Math.random() * maxOpacity
-            ctx.clearRect(
-              i * (squareSize + gridGap) * dpr,
-              j * (squareSize + gridGap) * dpr,
-              squareSize * dpr,
-              squareSize * dpr,
-            )
-            ctx.fillStyle = palette[Math.min(Math.round((squares[idx] / paletteDivisor) * paletteMax), paletteMax)]
-            ctx.fillRect(
-              i * (squareSize + gridGap) * dpr,
-              j * (squareSize + gridGap) * dpr,
-              squareSize * dpr,
-              squareSize * dpr,
-            )
-          } else if (needsFullRedraw) {
+      const totalCells = cols * rows
+      // Calculate how many cells to update this frame
+      const updateCount = Math.ceil(totalCells * flickerChance * delta)
+
+      if (needsFullRedraw) {
+        // Full redraw: draw all cells
+        for (let i = 0; i < cols; i++) {
+          for (let j = 0; j < rows; j++) {
+            const idx = i * rows + j
             ctx.fillStyle = palette[Math.min(Math.round((squares[idx] / paletteDivisor) * paletteMax), paletteMax)]
             ctx.fillRect(
               i * (squareSize + gridGap) * dpr,
@@ -120,6 +109,27 @@ export default function FlickeringGrid({
               squareSize * dpr,
             )
           }
+        }
+      } else {
+        // Partial update: only update random subset
+        for (let k = 0; k < updateCount; k++) {
+          const idx = Math.floor(Math.random() * totalCells)
+          const i = Math.floor(idx / rows)
+          const j = idx % rows
+          squares[idx] = Math.random() * maxOpacity
+          ctx.clearRect(
+            i * (squareSize + gridGap) * dpr,
+            j * (squareSize + gridGap) * dpr,
+            squareSize * dpr,
+            squareSize * dpr,
+          )
+          ctx.fillStyle = palette[Math.min(Math.round((squares[idx] / paletteDivisor) * paletteMax), paletteMax)]
+          ctx.fillRect(
+            i * (squareSize + gridGap) * dpr,
+            j * (squareSize + gridGap) * dpr,
+            squareSize * dpr,
+            squareSize * dpr,
+          )
         }
       }
       animId = requestAnimationFrame(draw)

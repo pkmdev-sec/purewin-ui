@@ -24,13 +24,18 @@ export default function TracingBeam({ children, className = '' }) {
   const y1 = useSpring(y1Raw, { stiffness: 80, damping: 26 })
   const y2 = useSpring(y2Raw, { stiffness: 80, damping: 26 })
 
-  // Imperatively update SVG gradient y1/y2
-  useMotionValueEvent(y1, 'change', (v) => {
-    if (gradientRef.current) gradientRef.current.setAttribute('y1', String(Math.max(0, v)))
-  })
-  useMotionValueEvent(y2, 'change', (v) => {
-    if (gradientRef.current) gradientRef.current.setAttribute('y2', String(Math.max(50, v)))
-  })
+  // Imperatively update SVG gradient y1/y2 via spring subscriptions
+  useEffect(() => {
+    const unsubY1 = y1.on('change', (v) => {
+      if (gradientRef.current) gradientRef.current.setAttribute('y1', String(Math.max(0, v)))
+    })
+    const unsubY2 = y2.on('change', (v) => {
+      if (gradientRef.current) gradientRef.current.setAttribute('y2', String(Math.max(50, v)))
+    })
+    return () => { unsubY1(); unsubY2() }
+  }, [y1, y2])
+
+  // Update dot color based on scroll progress
   useMotionValueEvent(scrollYProgress, 'change', (v) => {
     if (dotRef.current) {
       dotRef.current.style.backgroundColor = v > 0.02 ? '#ffffff' : '#8b5cf6'
