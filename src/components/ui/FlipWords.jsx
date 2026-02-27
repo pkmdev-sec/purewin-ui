@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 /**
  * FlipWords — React port of inspira-ui's FlipWords.vue
@@ -11,22 +11,30 @@ export default function FlipWords({
   className = '',
 }) {
   const [currentIdx, setCurrentIdx] = useState(0)
-  const [phase, setPhase] = useState('visible')  // 'visible' | 'leaving' | 'entering'
+  const [phase, setPhase] = useState('visible')
+  const outerRef = useRef(null)
+  const innerRef = useRef(null)
+  const innermostRef = useRef(null)
+  const wordsKey = words.join(',')
 
   useEffect(() => {
     if (words.length === 0) return
 
-    const timerId = setTimeout(() => {
+    outerRef.current = setTimeout(() => {
       setPhase('leaving')
-      setTimeout(() => {
+      innerRef.current = setTimeout(() => {
         setCurrentIdx(i => (i + 1) % words.length)
         setPhase('entering')
-        setTimeout(() => setPhase('visible'), 400)
+        innermostRef.current = setTimeout(() => setPhase('visible'), 400)
       }, 500)
     }, duration)
 
-    return () => clearTimeout(timerId)
-  }, [currentIdx, words, duration])
+    return () => {
+      clearTimeout(outerRef.current)
+      clearTimeout(innerRef.current)
+      clearTimeout(innermostRef.current)
+    }
+  }, [currentIdx, wordsKey, duration])
 
   const word = words[currentIdx] || ''
   const wordAnimation = phase === 'leaving'
