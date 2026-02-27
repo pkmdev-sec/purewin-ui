@@ -73,6 +73,7 @@ export default function FlickeringGrid({
       for (let i = 0; i < squares.length; i++) {
         squares[i] = Math.random() * maxOpacity
       }
+      fullRedrawCounter = 60
     }
 
     let fullRedrawCounter = 0
